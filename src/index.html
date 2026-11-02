@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>iPhone Duo teardown</title>
+<meta name="description" content="An interactive 3D teardown of the iPhone Duo, rebuilt from code in the order iFixit opened it. Every number is sourced. Not affiliated with Apple or iFixit.">
+<meta name="theme-color" content="#FAF9F6">
+<meta property="og:type" content="website">
+<meta property="og:title" content="iPhone Duo teardown">
+<meta property="og:description" content="Take the iPhone Duo apart in your browser: %PARTS% parts, %SCREWS% screws and %CHIPS% chips, in the order they come out, with a source on every number.">
+<meta property="og:url" content="%SITE_URL%">
+<meta property="og:image" content="%SITE_URL%duo-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="An exploded 3D model of the iPhone Duo on a pale background">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="iPhone Duo teardown">
+<meta name="twitter:description" content="Take the iPhone Duo apart in your browser: %PARTS% parts, %SCREWS% screws and %CHIPS% chips, in the order they come out, with a source on every number.">
+<meta name="twitter:image" content="%SITE_URL%duo-card.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='6' width='24' height='20' rx='3' fill='%2317191C'/%3E%3Crect x='15.25' y='6' width='1.5' height='20' fill='%23F58025'/%3E%3C/svg%3E">
+<style>
+/*FONTS*/
+/*STYLE*/
+</style>
+</head>
+<body>
+<header class="site-top">
+  <a class="site-brand" href="https://protomota.com/"><img src="%LOGO%" width="24" height="24" alt=""> Protomota</a>
+  <nav aria-label="Protomota">
+    <a href="https://experiments.protomota.com/">Experiments</a>
+    <a href="https://protomota.com/#apps">Apps</a>
+    <a href="https://protomota.com/#about">About</a>
+    <a class="site-contact" href="https://protomota.com/#contact">Contact</a>
+  </nav>
+</header>
+<main class="bench" id="bench">
+  <header class="title">
+    <h1>iPhone Duo teardown</h1>
+    <p class="lede">Apple’s first folding iPhone, rebuilt from code and taken apart in repair order: %PARTS% parts, %SCREWS% screws and %CHIPS% chips.</p>
+    <p class="independent">Not affiliated with Apple or iFixit.</p>
+  </header>
+
+  <nav class="steps" id="steps" aria-label="Parts in removal order"></nav>
+
+  <section class="stage" id="stage" aria-label="3D model of the iPhone Duo">
+    <canvas id="view" aria-hidden="true"></canvas>
+    <svg class="leaders" id="leaders" aria-hidden="true"></svg>
+    <div class="stage-top">
+      <a class="chapter" id="chapter" target="_blank" rel="noopener"></a>
+      <button class="restart" id="restart" type="button">Start over</button>
+    </div>
+    <div class="views" id="views" role="group" aria-label="Camera views"></div>
+    <p class="no-webgl" id="no-webgl" hidden>The 3D model needs WebGL. Turn on hardware acceleration in your browser settings and reload this page. The parts list and every sourced number still work.</p>
+  </section>
+
+  <aside class="sheet" id="sheet">
+    <div id="detail" aria-live="polite"></div>
+    <div id="pieces"></div>
+    <section class="specs" aria-label="iPhone Duo specifications">
+      <h2>iPhone Duo</h2>
+      <dl id="specs"></dl>
+    </section>
+  </aside>
+
+  <section class="procedure" aria-label="Teardown progress">
+    <div class="readout" id="readout"></div>
+    <div class="transport">
+      <button class="play" id="play" type="button"></button>
+      <div class="track">
+        <input id="progress" type="range" min="0" max="1" step="0.001" value="0" aria-label="Teardown progress, sealed to fully exploded">
+        <div class="ticks" id="ticks" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <p class="credit">
+    Teardown order and findings from <a href="https://www.ifixit.com/News/119895/iphone-duo-teardown" target="_blank" rel="noopener">iFixit’s iPhone Duo teardown</a>, restated in our own words under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" target="_blank" rel="noopener">CC BY-NC-SA 3.0</a>.
+    Not affiliated with, authorized or endorsed by Apple or iFixit.
+  </p>
+</main>
+
+<section class="notes" aria-label="Notes and sources">
+  <div>
+    <h2>How this was made</h2>
+    <p>No photo appears on this page. The phone is drawn entirely by code, using iFixit’s photos and Apple’s service diagrams as a reference for what goes where.</p>
+    <p>Part shapes and positions are traced by eye to place them in the model. They are not measurements. The hinge is the exception: its two pivot points are worked out from Apple’s published open and closed sizes, so the model lands on both.</p>
+    <p>Every screw is placed from Apple’s screw diagrams and carries Apple’s part number and torque. Every named chip is placed from iFixit’s chip ID photos. The crowd of tiny capacitors and resistors around them is drawn to look right: nobody has published those, so they are not counted or named.</p>
+    <p>The chapters follow iFixit’s video. Inside each chapter, the order of the small parts comes from Apple’s repair procedures, because iFixit did not call out every step. iFixit’s repairability score is provisional, and iFixit has not published a Duo repair guide yet.</p>
+  </div>
+  <div>
+    <h2>Not published anywhere we could find</h2>
+    <ul id="unsourced"></ul>
+    <p>These stay blank here rather than being estimated.</p>
+  </div>
+  <div>
+    <h2>Sources</h2>
+    <ul class="sources" id="sources"></ul>
+  </div>
+  <div class="legal">
+    <h2>Credits</h2>
+    <p>Findings by <a href="https://www.ifixit.com/" target="_blank" rel="noopener">iFixit</a>, licensed <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" target="_blank" rel="noopener">CC BY-NC-SA 3.0</a>. Changes: rewritten and rearranged as an interactive model. iPhone is a trademark of Apple Inc. iFixit is a trademark of iFixit. This is an independent project with no connection to either company.</p>
+  </div>
+</section>
+
+<footer class="site-foot">
+  <a class="site-brand" href="https://protomota.com/"><img src="%LOGO%" width="22" height="22" alt=""> Protomota</a>
+  <nav aria-label="Protomota links">
+    <a href="https://protomota.com/">Home</a>
+    <a href="https://experiments.protomota.com/">Experiments</a>
+    <a href="https://protomota.com/#apps">Apps</a>
+    <a href="https://protomota.com/#contact">Contact</a>
+    <a href="https://protomota.com/privacy">Privacy</a>
+    <a href="https://protomota.com/terms">Terms</a>
+  </nav>
+  <span>© 2026 Protomota · Brad Dunlap</span>
+</footer>
+
+<div class="cursor" id="cursor" hidden></div>
+<script>
+/*SCRIPT*/
+</script>
+</body>
+</html>

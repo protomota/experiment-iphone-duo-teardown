@@ -1,0 +1,31 @@
+{
+  "name": "iphone-duo-teardown",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An interactive 3D teardown of the iPhone Duo, built from code.",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "build": "node build.mjs",
+    "check": "node tools/check.mjs",
+    "release": "node build.mjs && node tools/card.mjs && mkdir -p dist && cp teardown-out/dist/duo-live.html dist/index.html && cp teardown-out/dist/duo-card.png dist/duo-card.png"
+  },
+  "dependencies": {
+    "@fontsource-variable/space-grotesk": "5.3.0"
+  },
+  "devDependencies": {
+    "@fontsource/jetbrains-mono": "5.3.0",
+    "esbuild": "0.28.2",
+    "playwright": "1.63.0",
+    "three": "0.186.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/protomota/experiment-iphone-duo-teardown"
+  },
+  "homepage": "https://protomota.com/experiments/iphone-duo-teardown",
+  "engines": {
+    "node": ">=20"
+  }
+}

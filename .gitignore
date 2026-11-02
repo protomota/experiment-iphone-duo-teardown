@@ -1,0 +1,6 @@
+node_modules/
+teardown-out/
+review/
+.DS_Store
+.env
+.env.*
