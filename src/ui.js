@@ -360,19 +360,6 @@ export function createUI({onPart, onPiece, onView, onSlide, onPlay, onRestart}) 
     drawLeaders(M.calloutsAt(p, focus && iso > 0.5 ? focus : null, view, pick), stage.project, w, h);
   };
 
-  const cursor = $('cursor');
-  /** The tour's cursor rides the slider thumb, and crosses to a part's button while that part is isolated. */
-  const moveCursor = (time) => {
-    cursor.hidden = matchMedia('(pointer: coarse)').matches || innerWidth < WIDE || time === null;
-    if (cursor.hidden) return;
-    const {p, focus, iso} = M.tourAt(time);
-    const track = slider.getBoundingClientRect();
-    const thumb = [track.left + 10 + p * (track.width - 20), track.top + track.height / 2];
-    const box = focus ? steps[focus].getBoundingClientRect() : null;
-    const button = box?.width ? [box.left + 11, box.top + box.height / 2] : thumb;
-    cursor.style.transform = `translate(${thumb[0] + (button[0] - thumb[0]) * iso}px, ${thumb[1] + (button[1] - thumb[1]) * iso}px)`;
-  };
-
   renderDetail(M.SEALED);
   shownId = M.SEALED.id;
   followChapter(M.CHAPTERS[1].id);
@@ -381,5 +368,5 @@ export function createUI({onPart, onPiece, onView, onSlide, onPlay, onRestart}) 
     renderDetail(M.PART[id]);
     renderPieces(id, () => {});
   };
-  return {sync, moveCursor, show};
+  return {sync, show};
 }

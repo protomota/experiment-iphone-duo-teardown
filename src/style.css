@@ -179,9 +179,6 @@ h1 { font-size: 25px; line-height: 1.1; font-weight: 600; letter-spacing: -0.01e
 .notes li { margin-bottom: 4px; }
 .notes ul + p { margin-top: 9px; color: var(--ink-2); }
 
-/* the tour's cursor */
-.cursor { position: fixed; left: 0; top: 0; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; border: 2px solid var(--ink); background: rgba(245, 128, 37, 0.3); pointer-events: none; z-index: 5; will-change: transform; }
-
 /* ------------------------------------------------------------ narrower screens */
 @media (max-width: 1180px) {
   .bench { grid-template-columns: 200px minmax(0, 1fr) 264px; gap: 0 14px; }
@@ -237,13 +234,12 @@ h1 { font-size: 25px; line-height: 1.1; font-weight: 600; letter-spacing: -0.01e
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cursor { display: none; }
   .group-steps, .group-inner, .step .n { transition: none; }
 }
 
 /* ------------------------------------------------------------ the share card, 1200 x 630 */
 body.card { width: 1200px; height: 630px; overflow: hidden; }
-body.card .site-top, body.card .site-foot, body.card .notes, body.card .cursor, body.card .independent, body.card .steps, body.card .sheet, body.card .procedure, body.card .credit, body.card .views, body.card .stage-top, body.card .leaders, body.card .lede { display: none; }
+body.card .site-top, body.card .site-foot, body.card .notes, body.card .independent, body.card .steps, body.card .sheet, body.card .procedure, body.card .credit, body.card .views, body.card .stage-top, body.card .leaders, body.card .lede { display: none; }
 body.card .stage canvas { top: 0; height: 100%; }
 body.card .bench { display: block; position: relative; height: 630px; min-height: 0; padding: 0; }
 body.card .stage { position: absolute; left: 330px; top: 0; right: 0; bottom: 0; }

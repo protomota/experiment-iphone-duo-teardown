@@ -110,7 +110,6 @@ const takeOver = () => {
   const goal = goalCamera();
   live.orbit = {az: cam.az - goal.az, el: 0, zoom: 1};
   live.dirty = true;
-  ui.moveCursor(null);
 };
 
 /** Plays from time, fading in from whatever is on screen, and takes longer to get there from further away. */
@@ -266,7 +265,6 @@ const stepTour = (dt) => {
   }
   live.view = tour.view;
   showFrame({p: live.p, focus: live.focus, iso: live.iso, view: tour.view, touring: true, pick: tour.pick, selected: tour.selected}, live.cam);
-  ui.moveCursor(live.attract ? live.tourTime : null);
 };
 
 const stepLive = (dt) => {
@@ -332,7 +330,6 @@ const startCapture = () => {
     render(time) {
       const tour = M.tourAt(time);
       showFrame({...tour, touring: true}, M.tourCamera(time, aspect()));
-      ui.moveCursor(time);
       return {};
     },
   };
