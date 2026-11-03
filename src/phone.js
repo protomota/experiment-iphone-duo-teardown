@@ -30,6 +30,7 @@ const railOutline = (sign) => {
 // The display side of each half stops short of the hinge's steel arms. A shelf carries the frame over them, on the
 // exterior side, with a row of screws along it and a gap for the flex cable.
 const FRAME_EDGE = 11.8;
+const BACKING_EDGE = FRAME_EDGE - 0.05;
 const SHELF_EDGE = HINGE.halfThick + 0.25;
 const floorOutline = (sign) => {
   const x = HINGE.halfOpen - 0.9;
@@ -61,8 +62,8 @@ const buildEnclosure = () => {
   // the bare brushed patches under the batteries, traced from iFixit's strip-down photos
   const patch = (points, r, y, carrier) => part.add('brushed', slab(outline(points, r), -4.1, y, 0, 4), carrier);
   patch([[-70, -34], [-44, -34], [-37, 4], [-37, 9], [-58, 26], [-70, 26]], 1.4, -3.96, 'B');
-  patch([[-44, 37], [-10, 15], [-10, 37]], 1, -3.96, 'B');
-  patch(rect(-22, -35, -10, -8), 1, -3.96, 'B');
+  patch([[-44, 37], [-12.4, 16.2], [-12.4, 37]], 1, -3.96, 'B');
+  patch(rect(-22, -35, -12.4, -8), 1, -3.96, 'B');
   patch(rect(17, -41, 38, -14), 2, -3.96, 'O');
   patch(rect(62.6, -43, 78, 21), 1.4, -3.96, 'O');
   // the dimpled pad between them, edged in copper
@@ -385,9 +386,21 @@ const GEAR_Y = -2.9;
 const GEAR_X = [-3 * GEAR_R, -GEAR_R, GEAR_R, 3 * GEAR_R];
 const ARM_ROWS = [[15, 23.5], [24, 32.5], [33, 41.5], [42, 50.5], [51, 56.5]].flatMap(([a, b]) => [[a, b], [-b, -a]]);
 
+// A dual-axis hinge: the blocks' outer wings ride on each half's axis, so they turn with the half while the middle
+// stays with the cover. A part outside an axis goes to that side's wing; a block across both is cut at the axes.
+const WING = HINGE.axisX;
+const wingOf = (x) => (x > WING ? 'R' : x < -WING ? 'L' : '');
+
 const buildHinge = () => {
   const part = createPart('hinge');
   const y = -3.3;
+  const wide = (material, x0, x1, z0, z1, y0, y1, r, bevel, name) => {
+    for (const [a, b] of [[x0, -WING], [-WING, WING], [WING, x1]]) {
+      const lo = Math.max(a, x0);
+      const hi = Math.min(b, x1);
+      if (hi - lo > 0.05) part.add(material, block(lo, z0, hi, z1, y0, y1, Math.min(r, (hi - lo) / 2 - 0.01), bevel), name + wingOf((lo + hi) / 2));
+    }
+  };
   for (const end of [-1, 1]) {
     const zone = (name) => {
       const [a, b] = ZONES[name];
@@ -395,40 +408,48 @@ const buildHinge = () => {
     };
     for (const name of ['pinOuter', 'pinInner']) {
       const [z0, z1] = zone(name);
-      part.add('steel', block(-4.8, z0, 4.8, z1, -3.9, -2.4, 0.5, 0.1), 'pins');
+      wide('steel', -4.8, 4.8, z0, z1, -3.9, -2.4, 0.5, 0.1, 'pins');
       for (const x of [-3, 3]) {
-        part.add('gold', disc(x, (z0 + z1) / 2, 1.4, -3.96, -3.9, 16), 'pins');
-        part.add('plastic', disc(x, (z0 + z1) / 2, 0.6, -4, -3.96, 10), 'pins');
+        part.add('gold', disc(x, (z0 + z1) / 2, 1.4, -3.96, -3.9, 16), 'pins' + wingOf(x));
+        part.add('plastic', disc(x, (z0 + z1) / 2, 0.6, -4, -3.96, 10), 'pins' + wingOf(x));
       }
       // the pins through each block, and the retaining clips on their ends
       for (const x of [-4.2, -1.2, 1.2, 4.2]) {
         const pin = new THREE.CylinderGeometry(0.34, 0.34, z1 - z0 + 0.8, 8);
         pin.rotateX(Math.PI / 2);
-        part.fine('steel', pin.translate(x, -2.2, (z0 + z1) / 2), 'pins');
+        part.fine('steel', pin.translate(x, -2.2, (z0 + z1) / 2), 'pins' + wingOf(x));
         for (const z of [z0 - 0.3, z1 + 0.3]) {
           const clip = new THREE.CylinderGeometry(0.46, 0.46, 0.12, 10);
           clip.rotateX(Math.PI / 2);
-          part.fine('gold', clip.translate(x, -2.2, z), 'pins');
+          part.fine('gold', clip.translate(x, -2.2, z), 'pins' + wingOf(x));
         }
       }
     }
     for (const name of ['springOuter', 'springInner']) {
       const [z0, z1] = zone(name);
-      for (const x of [-4, -2.4, -0.8, 0.8, 2.4, 4]) part.fine('steel', spring(x, y, z0, z1, 0.7), 'springs');
-      part.add('frame', block(-4.8, z0 - 0.2, 4.8, z0 + 0.2, -3.9, -2.6, 0.1), 'springs');
-      part.add('frame', block(-4.8, z1 - 0.2, 4.8, z1 + 0.2, -3.9, -2.6, 0.1), 'springs');
+      for (const x of [-4, -2.4, -0.8, 0.8, 2.4, 4]) part.fine('steel', spring(x, y, z0, z1, 0.7), 'springs' + wingOf(x));
+      wide('frame', -4.8, 4.8, z0 - 0.2, z0 + 0.2, -3.9, -2.6, 0.1, 0, 'springs');
+      wide('frame', -4.8, 4.8, z1 - 0.2, z1 + 0.2, -3.9, -2.6, 0.1, 0, 'springs');
     }
     const [z0, z1] = zone('gears');
-    part.add('frame', block(-4.8, z0, 4.8, z0 + 0.8, -3.9, -2.4, 0.2), 'gears');
-    part.add('frame', block(-4.8, z1 - 0.8, 4.8, z1, -3.9, -2.4, 0.2), 'gears');
+    wide('frame', -4.8, 4.8, z0, z0 + 0.8, -3.9, -2.4, 0.2, 0, 'gears');
+    wide('frame', -4.8, 4.8, z1 - 0.8, z1, -3.9, -2.4, 0.2, 0, 'gears');
   }
   // the center support bar, dark, with a gap for the flex cable
   for (const [z0, z1] of [[-13.6, -7.6], [7.6, 13.6]]) {
-    part.add('plastic', block(-4.8, z0, 4.8, z1, -3.9, -2.6, 0.4, 0.06), 'bar');
-    for (const x of [-3.4, 3.4]) part.fine('steel', disc(x, (z0 + z1) / 2, 0.6, -2.6, -2.56, 10), 'bar');
+    wide('plastic', -4.8, 4.8, z0, z1, -3.9, -2.6, 0.4, 0.06, 'bar');
+    for (const x of [-3.4, 3.4]) part.fine('steel', disc(x, (z0 + z1) / 2, 0.6, -2.6, -2.56, 10), 'bar' + wingOf(x));
   }
-  part.add('plastic', block(-4.8, -13.6, -3.4, 13.6, -3.9, -2.6, 0.3), 'bar');
-  part.add('plastic', block(3.4, -13.6, 4.8, 13.6, -3.9, -2.6, 0.3), 'bar');
+  part.add('plastic', block(-4.8, -13.6, -3.4, 13.6, -3.9, -2.6, 0.3), 'barL');
+  part.add('plastic', block(3.4, -13.6, 4.8, 13.6, -3.9, -2.6, 0.3), 'barR');
+  // the backing over each wing, joining the plate on the arms, so only the spine between the two axes shows
+  const reach = M.hingeLinks(0)[2].x + 0.15;
+  for (const [sign, side] of [[-1, 'L'], [1, 'R']]) {
+    for (const [z0, z1] of [[-57.4, 57.4]]) {
+      const [x0, x1] = sign > 0 ? [WING + 0.1, reach] : [-reach, -WING - 0.1];
+      part.add('frame', block(x0, z0, x1, z1, HINGE.axisY - 0.98, HINGE.axisY - 0.58, 0.2), 'pins' + side);
+    }
+  }
   M.hingeLinks(0).forEach(({length}, level) => {
     for (const sign of [-1, 1]) {
       const carrier = `link${sign > 0 ? 'R' : 'L'}${level}`;
@@ -444,6 +465,10 @@ const buildHinge = () => {
       const flip = (geometry) => (sign > 0 ? geometry : geometry.rotateY(Math.PI));
       for (const z of [-13.6, 12.6]) part.add('steel', flip(block(0, z, length, z + 1, -0.3, 0.3, 0.2)), carrier);
       part.add('steel', flip(block(length - 1, -13.6, length, 13.6, -0.3, 0.3, 0.2)), carrier);
+      // the backing plate over the arms, level with the frame's floor, so from the display side only the middle of the
+      // hinge shows. It leaves a window for the flex cable.
+      const plate = BACKING_EDGE - M.hingeLinks(0)[level].x;
+      for (const [z0, z1] of [[-57.4, 57.4]]) part.add('frame', flip(block(0.15, z0, plate, z1, -0.98, -0.58, 0.2)), carrier);
     }
   });
   const tooth = gear(GEAR_R, 10, 4);
@@ -456,7 +481,7 @@ const buildHinge = () => {
       const mesh = new THREE.Mesh(tooth, toothMaterial);
       mesh.position.set(x, GEAR_Y, z);
       mesh.userData.index = i;
-      part.group('gears').add(mesh);
+      part.group('gears' + wingOf(x)).add(mesh);
       part.meshes.push(mesh);
       part.gears.push(mesh);
     });
@@ -559,8 +584,17 @@ export function buildPhone({shadows}) {
 
   // the hinge's chain of links lives in the cover's frame, posed joint by joint
   const hingeRoot = new THREE.Group();
-  const hingeGroups = Object.fromEntries(['pins', 'springs', 'gears', 'bar'].map((name) => [name, parts.hinge.group(name)]));
+  const HINGE_GROUPS = ['pins', 'springs', 'gears', 'bar'];
+  const hingeGroups = Object.fromEntries(HINGE_GROUPS.map((name) => [name, parts.hinge.group(name)]));
   hingeRoot.add(...Object.values(hingeGroups));
+  // each wing turns about its half's axis
+  const wings = Object.fromEntries(HINGE_GROUPS.map((name) => {
+    const pair = {L: carrier(-1), R: carrier(1)};
+    pair.L.inner.add(parts.hinge.group(`${name}L`));
+    pair.R.inner.add(parts.hinge.group(`${name}R`));
+    hingeRoot.add(pair.L.pivot, pair.R.pivot);
+    return [name, pair];
+  }));
   const links = [0, 1, 2].map((level) => ({L: parts.hinge.group(`linkL${level}`), R: parts.hinge.group(`linkR${level}`)}));
   for (const {L, R} of links) hingeRoot.add(L, R);
   root.add(hingeRoot);
@@ -618,8 +652,14 @@ export function buildPhone({shadows}) {
     for (const mesh of parts.hinge.gears) mesh.rotation.z = M.gearTurn(shell, mesh.userData.index);
     const rise = M.hingeRise(shell);
     const spread = M.hingeSpread(p);
-    hingeGroups.pins.position.y = rise;
-    for (const name of ['springs', 'gears', 'bar']) hingeGroups[name].position.y = rise + spread[name];
+    for (const name of HINGE_GROUPS) {
+      const lift = rise + (spread[name] ?? 0);
+      hingeGroups[name].position.y = lift;
+      wings[name].L.pivot.position.y = HINGE.axisY + lift;
+      wings[name].R.pivot.position.y = HINGE.axisY + lift;
+      wings[name].L.pivot.rotation.z = shell;
+      wings[name].R.pivot.rotation.z = -shell;
+    }
     parts.innerDisplay.setStrip(phi);
     parts.displayTrim.setStrip(phi);
     parts.flexCable.setStrip(phi);
